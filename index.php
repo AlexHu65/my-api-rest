@@ -69,7 +69,7 @@ $app->get(
 
 //Searches for robots with  $name in their name
 $app->get(
-    '/api/robots/search/{$name}',
+    '/api/robots/search/{name}',
     function ($name) use ($app) {
         //Operation to fetch robot with name $name
         $phql = 'SELECT * FROM Store\Toys\Robots WHERE name LIKE :name: ORDER BY name';
@@ -133,6 +133,7 @@ $app->get(
     }
 );
 
+// Adds a new robot
 $app->post(
     '/api/robots',
     function () use ($app) {
@@ -149,13 +150,12 @@ $app->post(
             ]
         );
 
-        //Create a response
+        // Create a response
         $response = new Response();
 
-        //Check if the insertion was successful
-        if ($status->sucess() === true) {
-
-            //Change the http status
+        // Check if the insertion was successful
+        if ($status->success() === true) {
+            // Change the HTTP status
             $response->setStatusCode(201, 'Created');
 
             $robot->id = $status->getModel()->id;
@@ -163,37 +163,33 @@ $app->post(
             $response->setJsonContent(
                 [
                     'status' => 'OK',
-                    'data' => $robot
+                    'data'   => $robot,
                 ]
             );
-
-
         } else {
-
-            //Change the http status
+            // Change the HTTP status
             $response->setStatusCode(409, 'Conflict');
 
-            //Set the errors to the client
+            // Send errors to the client
             $errors = [];
 
             foreach ($status->getMessages() as $message) {
                 $errors[] = $message->getMessage();
-
             }
 
             $response->setJsonContent(
                 [
-                    'status' => 'ERROR',
-                    'messages' => $errors
+                    'status'   => 'ERROR',
+                    'messages' => $errors,
                 ]
             );
         }
 
         return $response;
-
     }
 );
 
+//Update robots
 $app->put(
     '/api/robots/{id:[0-9]+}',
     function ($id) use ($app) {
